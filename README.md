@@ -16,4 +16,4 @@ This project is in it's development phase
 - [ ] Implement Redis Caching
 - [ ] Rate Limit the API
 - [ ] Automation: CI/CD
-- [ ] Production deployment to Google Cloud
+- [ ] Production deployment to AWS/Google Cloud
