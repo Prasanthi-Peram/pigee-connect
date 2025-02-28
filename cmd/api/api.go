@@ -49,6 +49,11 @@ func (app *application) mount() *chi.Mux{
 	r.Route("/v1",func(r chi.Router){
 		//Sub-Router
 		r.Get("/health", app.healthCheckHandler)
+
+		r.Route("/posts", func(r chi.Router) {
+			//r.Use(app.AuthTokenMiddleware)
+			r.Post("/", app.createPostHandler)
+		})
 	})
 	return r
 }
