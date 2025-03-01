@@ -67,7 +67,7 @@ func(s *PostStore) GetByID(ctx context.Context,id int64) (*Post,error){
 		&post.Content,
 		&post.CreatedAt,
 		&post.UpdatedAt,
-		&post.Tags,
+		pq.Array(&post.Tags),
 	)
 	if err !=nil{
 		switch{
