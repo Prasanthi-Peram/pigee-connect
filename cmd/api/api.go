@@ -54,6 +54,10 @@ func (app *application) mount() *chi.Mux{
 			//r.Use(app.AuthTokenMiddleware)
 			r.Post("/", app.createPostHandler)
 		})
+
+		r.Route("/{postID}",func(r chi.Router){
+			r.Get("/",app.getPostHandler)
+		})
 	})
 	return r
 }
