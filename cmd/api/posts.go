@@ -68,3 +68,27 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 			writeJSONError(w,http.StatusInternalServerError,err.Error())
 		}
 	}	
+
+
+func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "postID")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError,err.Error())
+		return
+	}
+
+	ctx := r.Context()
+
+	if err := app.store.Posts.Delete(ctx, id); err != nil {
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			writeJSONError(w,http.StatusNotFound,err.Error())
+		default:
+			writeJSONError(w, http.StatusInternalServerError,err.Error())
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}	
