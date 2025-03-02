@@ -6,7 +6,7 @@ The task is to build a basic Authentication system. However as an extension to i
 This project is in it's development phase
 
 ### **Checklist**
-- [X] Link Users with Posts(Implement a foreign key)
+- [X] Add foreign key constraint to link Posts with Users
 - [ ] Define CRUD Operations for Posts
 - [ ] Implement the User Feed Logic and followers
 - [ ] Add Filtering, Sorting and Pagination
