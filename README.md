@@ -7,7 +7,7 @@ This project is in it's development phase
 
 ### **Checklist**
 - [X] Add foreign key constraint to link Posts with Users
-- [ ] Define CRUD Operations for Posts
+- [X] Define CRUD Operations for Posts
 - [ ] Implement the User Feed Logic and followers
 - [ ] Add Filtering, Sorting and Pagination
 - [ ] Auto-generate docs for the API
