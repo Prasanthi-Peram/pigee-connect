@@ -130,6 +130,8 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	
+
 	if err := Validate.Struct(payload); err!=nil {
 		app.badRequestResponse(w,r,err)
 		return
