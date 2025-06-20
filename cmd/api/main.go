@@ -1,7 +1,7 @@
 package main
 import(
-	"log"
-
+	//"log"
+	 "go.uber.org/zap"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/env"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/db"
@@ -39,7 +39,11 @@ func main(){
 		},
 		env: env.GetString("ENV","development"),
 	}
+    //Logger
+	logger:=zap.Must(zap.NewProduction()).Sugar()
+	defer logger.Sync()
 
+	//Database
 	db,err:= db.New(
 		cfg.db.addr,
 		cfg.db.maxOpenConns,
@@ -47,18 +51,19 @@ func main(){
 		cfg.db.maxIdleTime,
 	)
 	if err!=nil{
-		log.Panic(err)
+		logger.Fatal(err)
 	}
 	defer db.Close()
-	log.Print("db connection pool established")
+	logger.Info("db connection pool established")
 
 
 	store:= store.NewStorage(db)
 	app:=&application{
 		config:cfg,
 		store: store,
+		logger: logger,
 	}
 
 	mux:=app.mount()
-	log.Fatal(app.run(mux))
+	logger.Fatal(app.run(mux))
 }
