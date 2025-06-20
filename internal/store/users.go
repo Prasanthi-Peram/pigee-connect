@@ -3,7 +3,7 @@ package store
 import (
 	"database/sql"
 	"context"
-	"errors"
+	//"errors"
 )
 
 
@@ -56,7 +56,7 @@ func (s *UsersStore) GetByID(ctx context.Context, userID int64) (*User, error) {
 	err:=s.db.QueryRowContext(
 		ctx,
 		 query,
-		 user.ID,
+		 userID,
 	  ).Scan(
 		  &user.ID,
 		  &user.Username,
@@ -66,8 +66,8 @@ func (s *UsersStore) GetByID(ctx context.Context, userID int64) (*User, error) {
 	  )
   
 	  if err != nil {
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
+		switch err{
+		case sql.ErrNoRows:
 			return nil, ErrNotFound
 		default:
 			return nil, err
