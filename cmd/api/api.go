@@ -4,10 +4,13 @@ import(
 	"log"
 	"net/http"
 	"time"
+	"fmt"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/Prasanthi-Peram/social/internal/store"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
+	httpSwagger "github.com/swaggo/http-swagger"
+	"github.com/Prasanthi-Peram/pigee-connect/docs"
 )
 type application struct{
 	config config
@@ -18,6 +21,7 @@ type config struct{
 	addr string
 	db dbConfig
 	env string
+	apiURL string
 }
 
 type dbConfig struct{
@@ -47,6 +51,9 @@ func (app *application) mount() *chi.Mux{
 	// Group of Routes
 	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", app.healthCheckHandler)
+
+		docsURL := fmt.Sprintf("%s/swagger/doc.json",app.config.addr)
+		r.Get("/swagger/*",httpSwagger.Handler(httpSwagger.URL(docsURL)))
 
 		r.Route("/posts", func(r chi.Router) {
 			r.Post("/", app.createPostHandler)
@@ -83,6 +90,11 @@ func (app *application) mount() *chi.Mux{
 }
 
 func (app *application) run(mux http.Handler) error{
+
+	//Docs
+	docs.SwaggerInfo.Version=version
+	docs.SwaggerInfo.Host =app.config.apiURL
+	docs.SwaggerInfo.BasePath ="/v1"
 	srv:=&http.Server{
 		Addr: app.config.addr,
 		Handler: mux,

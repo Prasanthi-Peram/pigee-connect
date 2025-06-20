@@ -5,7 +5,7 @@ import(
 	"errors"
 	"context"
 
-	"github.com/Prasanthi-Peram/social/internal/store"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
 	"github.com/go-chi/chi/v5"
 )
 

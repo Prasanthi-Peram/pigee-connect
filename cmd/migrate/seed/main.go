@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	"github.com/Prasanthi-Peram/social/internal/db"
-	"github.com/Prasanthi-Peram/social/internal/env"
-	"github.com/Prasanthi-Peram/social/internal/store"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/db"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/env"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
 )
 
 func main() {

@@ -7,7 +7,7 @@ import(
 	"log"
 	"math/rand"
 
-	"github.com/Prasanthi-Peram/social/internal/store"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
 )
 
 

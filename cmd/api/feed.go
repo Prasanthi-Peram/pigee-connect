@@ -1,7 +1,7 @@
 package main
 import(
 	 "net/http"
-	 "github.com/Prasanthi-Peram/social/internal/store"
+	 "github.com/Prasanthi-Peram/pigee-connect/internal/store"
 )
 
 func (app *application) getUserFeedHandler(w http.ResponseWriter, r *http.Request){

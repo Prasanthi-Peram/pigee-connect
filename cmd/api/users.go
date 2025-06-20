@@ -8,7 +8,7 @@ import(
     "context"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/Prasanthi-Peram/social/internal/store"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
 )
 
 type userKey string
