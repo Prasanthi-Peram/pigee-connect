@@ -19,4 +19,4 @@ seed:
 
 .PHONY: gen-docs
 gen-docs:
-	@swag init -g ./api/main.go -d cmd,internal && swag fmt 
+	@swag init -g ./api/main.go -d cmd,internal  --parseDependency --parseInternal && swag fmt 
