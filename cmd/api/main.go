@@ -1,6 +1,7 @@
 package main
 import(
 	//"log"
+	"time"
 	 "go.uber.org/zap"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/env"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
@@ -40,7 +41,7 @@ func main(){
 		env: env.GetString("ENV","development"),
 		mail:mailConfig{
 			exp: time.Hour*24*3,
-		}
+		},
 	}
     //Logger
 	logger:=zap.Must(zap.NewProduction()).Sugar()

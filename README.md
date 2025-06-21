@@ -8,11 +8,11 @@ This project is in it's development phase
 ### **Checklist**
 - [X] Add foreign key constraint to link Posts with Users
 - [X] Define CRUD Operations for Posts
-- [ ] Implement the User Feed Logic and followers
-- [ ] Add Filtering, Sorting and Pagination
-- [ ] Auto-generate docs for the API
-- [ ] Implement Structured Logging
-- [ ] Implement basic Authentication feature
+- [X] Implement the User Feed Logic and followers
+- [X] Add Filtering, Sorting and Pagination
+- [X] Auto-generate docs for the API
+- [X] Implement Structured Logging
+- [X] Implement basic Authentication feature
 - [ ] Implement Redis Caching
 - [ ] Rate Limit the API
 - [ ] Automation: CI/CD
