@@ -12,11 +12,14 @@ import(
 	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/Prasanthi-Peram/pigee-connect/docs"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/mailer"
+	"github.com/rs/cors"
 )
 type application struct{
 	config config
 	store store.Storage
 	logger *zap.SugaredLogger
+	mailer mailer.Client
 }
 
 type config struct{
@@ -24,13 +27,21 @@ type config struct{
 	db dbConfig
 	env string
 	apiURL string
+	frontendURL string
 	mail mailConfig
 }
 
 type mailConfig struct{
+	sendGrid sendGridConfig
+	fromEmail string
 	exp time.Duration
 }
 
+type sendGridConfig struct{
+	apiKey string
+	
+}
+ 
 type dbConfig struct{
 	addr string
 	maxOpenConns int
@@ -42,6 +53,16 @@ func (app *application) mount() *chi.Mux{
 
 	r := chi.NewRouter()
 
+	r.Use(cors.Handler(cors.Options{
+		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300, // Maximum value not ignored by any of major browsers
+	  }))
 
 	r.Use(middleware.RequestID)
     r.Use(middleware.RealIP)

@@ -6,6 +6,7 @@ import(
 	"github.com/Prasanthi-Peram/pigee-connect/internal/env"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/db"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/mailer"
 )
 
 const version="0.0.1"
@@ -32,6 +33,7 @@ func main(){
 	cfg:=config{
 		addr:env.GetString("ADDR",":8080"),
 		apiURL:env.GetString("EXTERNAL_URL","localhost:8080"),
+		frontendURL: env.GetString("FRONTEND_URL","http://localhost:5174"),
 		db: dbConfig{
 			addr: env.GetString("DB_ADDR","postgres://admin:adminpassword@localhost/socialnetwork?sslmode=disable"),
 			maxOpenConns: env.GetInt("DB_MAX_OPEN_CONNS",30),
@@ -41,6 +43,12 @@ func main(){
 		env: env.GetString("ENV","development"),
 		mail:mailConfig{
 			exp: time.Hour*24*3,
+			fromEmail:env.GetString("FROM_EMAIL",""),
+
+			sendGrid: sendGridConfig{
+				apiKey:env.GetString("SENDGRID_API_KEY",""),
+				
+			},
 		},
 	}
     //Logger
@@ -62,10 +70,12 @@ func main(){
 
 
 	store:= store.NewStorage(db)
+	mailer := mailer.NewSendgrid(cfg.mail.sendGrid.apiKey,cfg.mail.fromEmail)
 	app:=&application{
 		config:cfg,
 		store: store,
 		logger: logger,
+		mailer: mailer,
 	}
 
 	mux:=app.mount()

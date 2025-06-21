@@ -1,11 +1,13 @@
 package main
 import (
 	"net/http"
+	"fmt"
 	"crypto/sha256"
 	"encoding/hex"
 	"github.com/google/uuid"
 
 	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/mailer"
 )
 
 type RegisterUserPayload struct {
@@ -80,7 +82,29 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		Token: plainToken,
 	}
 
+	activationURL:= fmt.Sprintf("%s/confirm/%s",app.config.frontendURL,plainToken)
+
+	isProdEnv := app.config.env=="production"
+	vars:=struct{
+		Username string
+		ActivationURL string 
+	}{
+		Username: user.Username,
+		ActivationURL: activationURL,
+	}
 	//mail
+	err =app.mailer.Send(mailer.UserWelcomeTemplate,user.Username,user.Email,vars, !isProdEnv)
+
+	if err!=nil{
+		app.logger("error sending welcome email","error",err)
+
+		//Rollback user creation if email fails
+		if err:=app.store.Users.Delete(ctx,user.ID);err!=nil{
+			app.logger.Errorw("error deleting user","error",err)
+		}
+		app.internalServerError(w,r,err)
+		return
+	}
 
 	if err:= app.jsonResponse(w, http.StatusCreated,userWithToken); err!=nil{
 		app.internalServerError(w,r,err)
