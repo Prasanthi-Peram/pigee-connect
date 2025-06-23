@@ -1,7 +1,7 @@
 package main
 import(
 	//"log"
-	"fmt"
+	//"fmt"
 	"time"
 	"os"
 	"github.com/joho/godotenv"
@@ -10,6 +10,7 @@ import(
 	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/db"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/mailer"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/auth"
 )
 
 const version="0.0.1"
@@ -55,9 +56,20 @@ func main(){
 				//fromEmail: env.GetString("FROM_EMAIL",""),
 			},
 		},
+		auth: authConfig{
+			basic: basicConfig{
+				user: env.GetString("AUTH_BASIC_USER","admin"),
+				pass: env.GetString("AUTH_BASIC_PASS","admin"),
+			},
+			token: tokenConfig{
+				secret: env.GetString("AUTH_TOKEN_SECRET","example"),
+				exp: time.Hour*24*3,
+				iss: "pigeeconnect",
+			},
+		},
 	}
-	fmt.Println("Loaded API Key from config:", cfg.mail.sendGrid.apiKey)
-	fmt.Println("Loaded API Key from config:", cfg.mail.fromEmail)
+	//fmt.Println("Loaded API Key from config:", cfg.mail.sendGrid.apiKey)
+	//fmt.Println("Loaded API Key from config:", cfg.mail.fromEmail)
     //Logger
 	logger:=zap.Must(zap.NewProduction()).Sugar()
 	defer logger.Sync()
@@ -78,11 +90,14 @@ func main(){
 
 	store:= store.NewStorage(db)
 	mailer := mailer.NewSendgrid(cfg.mail.sendGrid.apiKey,cfg.mail.fromEmail)
+	jwtAuthenticator:= auth.NewJWTAuthenticator(cfg.auth.token.secret,cfg.auth.token.iss,cfg.auth.token.iss)
+	
 	app:=&application{
 		config:cfg,
 		store: store,
 		logger: logger,
 		mailer: mailer,
+		authenticator: jwtAuthenticator,
 	}
 
 	mux:=app.mount()

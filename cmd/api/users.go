@@ -38,9 +38,6 @@ func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-type FollowUser struct{
-	UserID int64 `json:"user_id"`
-}
 // FollowUser godoc
 //	@Summary		Follows a user
 //	@Description	Follows a user by ID
@@ -56,25 +53,15 @@ type FollowUser struct{
 func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request) {
 	followerUser := getUserFromContext(r)
 
-
-	//TODO
-	var payload FollowUser
-	if err:= readJSON(w,r,&payload);err!=nil{
-		
+	followedID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
+	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
 	}
 
-
-	/*followedID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
-	if err != nil {
-		app.badRequestResponse(w, r, err)
-		return
-	}*/
-
 	ctx := r.Context()
 
-	if err := app.store.Followers.Follow(ctx,followerUser.ID,payload.UserID); err != nil {
+	if err := app.store.Followers.Follow(ctx,followerUser.ID,followedID); err != nil {
 		switch err {
 		case store.ErrConflict:
 			app.conflictResponse(w, r, err)
@@ -89,19 +76,30 @@ func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request
 		app.internalServerError(w, r, err)
 	}
 }
-
+// UnfollowUser gdoc
+//
+//	@Summary		Unfollow a user
+//	@Description	Unfollow a user by ID
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			userID	path		int		true	"User ID"
+//	@Success		204		{string}	string	"User unfollowed"
+//	@Failure		400		{object}	error	"User payload missing"
+//	@Failure		404		{object}	error	"User not found"
+//	@Security		ApiKeyAuth
+//	@Router			/users/{userID}/unfollow [put]
 func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Request) {
 	
-	unfollowedUser :=getUserFromContext(r)
-	//TODO
-	var payload FollowUser
-	if err:= readJSON(w,r,&payload);err!=nil{
-		app.badRequestResponse(w,r,err)
+	followerUser :=getUserFromContext(r)
+	unfollowedID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
+	if err != nil {
+		app.badRequestResponse(w, r, err)
 		return
 	}
 
 	ctx:=r.Context()
-	if err:=app.store.Followers.Unfollow(ctx, unfollowedUser.ID, payload.UserID);err!=nil{
+	if err:=app.store.Followers.Unfollow(ctx, followerUser.ID, unfollowedID);err!=nil{
 		app.internalServerError(w,r,err)
 		return
 	}

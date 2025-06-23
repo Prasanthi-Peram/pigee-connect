@@ -6,13 +6,15 @@ import(
 	"time"
 	"fmt"
 
-	 "go.uber.org/zap"
+	"go.uber.org/zap"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	
 	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/Prasanthi-Peram/pigee-connect/docs"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/mailer"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/auth"
     "github.com/go-chi/cors"
 )
 type application struct{
@@ -20,6 +22,7 @@ type application struct{
 	store store.Storage
 	logger *zap.SugaredLogger
 	mailer mailer.Client
+	authenticator auth.Authenticator
 }
 
 type config struct{
@@ -29,6 +32,23 @@ type config struct{
 	apiURL string
 	frontendURL string
 	mail mailConfig
+	auth authConfig
+}
+
+type authConfig struct{
+	basic basicConfig
+	token tokenConfig
+}
+
+type basicConfig struct{
+	user string
+	pass string
+}
+
+type tokenConfig struct{
+	secret string
+	exp time.Duration
+	iss string
 }
 
 type mailConfig struct{
@@ -78,12 +98,13 @@ func (app *application) mount() *chi.Mux{
 
 	// Group of Routes
 	r.Route("/v1", func(r chi.Router) {
-		r.Get("/health", app.healthCheckHandler)
+		r.With(app.BasicAuthMiddleware()).Get("/health", app.healthCheckHandler)
 
 		docsURL := fmt.Sprintf("%s/swagger/doc.json",app.config.addr)
 		r.Get("/swagger/*",httpSwagger.Handler(httpSwagger.URL(docsURL)))
 
 		r.Route("/posts", func(r chi.Router) {
+			r.Use(app.AuthTokenMiddleware)
 			r.Post("/", app.createPostHandler)
 
 			r.Route("/{postID}", func(r chi.Router) {
@@ -101,7 +122,7 @@ func (app *application) mount() *chi.Mux{
 		r.Route("/users",func(r chi.Router){
 			r.Put("/activate/{token}", app.activateUserHandler)
 			r.Route("/{userID}", func(r chi.Router){
-				r.Use(app.userContextMiddleware)
+				r.Use(app.AuthTokenMiddleware)
 
 
 				r.Get("/",app.getUserHandler)
@@ -117,6 +138,7 @@ func (app *application) mount() *chi.Mux{
 		//Public routes
 		r.Route("/authentication",func(r chi.Router){
 			r.Post("/user",app.registerUserHandler)
+			r.Post("/token",app.createTokenHandler)
 		})
 	})
 
