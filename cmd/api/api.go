@@ -13,7 +13,7 @@ import(
 	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/Prasanthi-Peram/pigee-connect/docs"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/mailer"
-	"github.com/rs/cors"
+    "github.com/go-chi/cors"
 )
 type application struct{
 	config config

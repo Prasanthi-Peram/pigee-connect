@@ -30,6 +30,8 @@ func (m *SendGridMailer) Send(templateFile, username, email string, data any, is
 	from := mail.NewEmail(FromName, m.fromEmail)
 	to := mail.NewEmail(username, email)
 
+	//app.logger.Infow("mail send attempted", "status", code, "error", err)
+
 	// template parsing and building
 	tmpl, err := template.ParseFS(FS, "templates/"+templateFile)
 	if err != nil {
@@ -59,6 +61,13 @@ func (m *SendGridMailer) Send(templateFile, username, email string, data any, is
 	var retryErr error
 	for i := 0; i < maxRetires; i++ {
 		response, retryErr := m.client.Send(message)
+		
+		fmt.Println("=== SendGrid Response ===")
+	fmt.Println("Status Code:", response.StatusCode)
+	fmt.Println("Body:", response.Body)
+	fmt.Println("Retry Error:", retryErr)
+	fmt.Println("=========================")
+		
 		if retryErr != nil {
 			// exponential backoff
 			time.Sleep(time.Second * time.Duration(i+1))

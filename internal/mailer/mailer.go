@@ -3,7 +3,7 @@ package mailer
 import "embed"
 
 const (
-	FromName            = "GopherSocial"
+	FromName            = "pigee-connect"
 	maxRetires          = 3
 	UserWelcomeTemplate = "user_invitation.tmpl"
 )

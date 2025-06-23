@@ -1,7 +1,10 @@
 package main
 import(
 	//"log"
+	"fmt"
 	"time"
+	"os"
+	"github.com/joho/godotenv"
 	 "go.uber.org/zap"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/env"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
@@ -30,6 +33,8 @@ const version="0.0.1"
 //	@description
 
 func main(){
+	
+	godotenv.Load()
 	cfg:=config{
 		addr:env.GetString("ADDR",":8080"),
 		apiURL:env.GetString("EXTERNAL_URL","localhost:8080"),
@@ -43,14 +48,16 @@ func main(){
 		env: env.GetString("ENV","development"),
 		mail:mailConfig{
 			exp: time.Hour*24*3,
-			fromEmail:env.GetString("FROM_EMAIL",""),
+			fromEmail: os.Getenv("FROM_EMAIL"),
 
 			sendGrid: sendGridConfig{
-				apiKey:env.GetString("SENDGRID_API_KEY",""),
-				
+				apiKey:os.Getenv("SENDGRID_API_KEY"),
+				//fromEmail: env.GetString("FROM_EMAIL",""),
 			},
 		},
 	}
+	fmt.Println("Loaded API Key from config:", cfg.mail.sendGrid.apiKey)
+	fmt.Println("Loaded API Key from config:", cfg.mail.fromEmail)
     //Logger
 	logger:=zap.Must(zap.NewProduction()).Sugar()
 	defer logger.Sync()
