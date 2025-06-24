@@ -7,9 +7,10 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"errors"
 
 	"github.com/golang-jwt/jwt/v5"
-	//"github.com/Prasanthi-Peram/pigee-connect/internal/store"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
 )
 
 func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
@@ -45,6 +46,10 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 
 		user, err := app.store.Users.GetByID(ctx, userID)
 		if err != nil {
+			if errors.Is(err, store.ErrNotFound) {
+				app.unauthorizedErrorResponse(w, r, fmt.Errorf("user not found"))
+				return
+			}
 			app.unauthorizedErrorResponse(w, r, err)
 			return
 		}
@@ -93,7 +98,7 @@ func (app *application) BasicAuthMiddleware() func(http.Handler) http.Handler {
 	}
 }
 
-/*func (app *application) checkPostOwnership(requiredRole string, next http.HandlerFunc) http.HandlerFunc {
+func (app *application) checkPostOwnership(requiredRole string, next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user := getUserFromContext(r)
 		post := getPostFromCtx(r)
@@ -125,7 +130,7 @@ func (app *application) checkRolePrecedence(ctx context.Context, user *store.Use
 	}
 
 	return user.Role.Level >= role.Level, nil
-}*/
+}
 
 /*func (app *application) getUser(ctx context.Context, userID int64) (*store.User, error) {
 	if !app.config.redisCfg.enabled {

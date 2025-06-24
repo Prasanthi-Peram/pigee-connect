@@ -4,6 +4,7 @@ import(
 	"strconv"
 	"errors"
 	"context"
+	"fmt"
 
 	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
 	"github.com/go-chi/chi/v5"
@@ -34,12 +35,13 @@ type CreatePostPayload struct {
 //	@Router			/posts [post]
 func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request) {
 
-
+	fmt.Println("=== createPostHandler called ===")
 	var payload CreatePostPayload
 	if err:= readJSON(w,r,&payload); err!=nil{
 		app.badRequestResponse(w,r,err)
 		return
 	}
+	fmt.Println("Payload received:", payload)
 
 	if err := Validate.Struct(payload); err != nil {
 		app.badRequestResponse(w, r, err)
@@ -47,6 +49,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	user:=getUserFromContext(r)
+	fmt.Println("User from context:", user)
 
 	post:=&store.Post{
 		Title:   payload.Title,
@@ -126,9 +129,11 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		int	true	"Post ID"
-//	@Success		204	{object} string
+//	@Success		204	{object}	string
 //	@Failure		404	{object}	error
 //	@Failure		500	{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/posts/{postID}/ [delete]
 func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
 	idParam := chi.URLParam(r, "postID")
 	id, err := strconv.ParseInt(idParam, 10, 64)
