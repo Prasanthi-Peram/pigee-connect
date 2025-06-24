@@ -44,7 +44,7 @@ func (app *application) AuthTokenMiddleware(next http.Handler) http.Handler {
 
 		ctx := r.Context()
 
-		user, err := app.store.Users.GetByID(ctx, userID)
+		user, err := app.getUser(ctx, userID)
 		if err != nil {
 			if errors.Is(err, store.ErrNotFound) {
 				app.unauthorizedErrorResponse(w, r, fmt.Errorf("user not found"))
@@ -132,7 +132,7 @@ func (app *application) checkRolePrecedence(ctx context.Context, user *store.Use
 	return user.Role.Level >= role.Level, nil
 }
 
-/*func (app *application) getUser(ctx context.Context, userID int64) (*store.User, error) {
+func (app *application) getUser(ctx context.Context, userID int64) (*store.User, error) {
 	if !app.config.redisCfg.enabled {
 		return app.store.Users.GetByID(ctx, userID)
 	}
@@ -156,7 +156,7 @@ func (app *application) checkRolePrecedence(ctx context.Context, user *store.Use
 	return user, nil
 }
 
-func (app *application) RateLimiterMiddleware(next http.Handler) http.Handler {
+/*func (app *application) RateLimiterMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if app.config.rateLimiter.Enabled {
 			if allow, retryAfter := app.rateLimiter.Allow(r.RemoteAddr); !allow {

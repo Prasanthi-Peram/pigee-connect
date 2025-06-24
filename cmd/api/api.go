@@ -16,10 +16,12 @@ import(
 	"github.com/Prasanthi-Peram/pigee-connect/internal/mailer"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/auth"
     "github.com/go-chi/cors"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/store/cache"
 )
 type application struct{
 	config config
 	store store.Storage
+	cacheStorage  cache.Storage
 	logger *zap.SugaredLogger
 	mailer mailer.Client
 	authenticator auth.Authenticator
@@ -33,8 +35,14 @@ type config struct{
 	frontendURL string
 	mail mailConfig
 	auth authConfig
+	redisCfg redisConfig
 }
-
+type redisConfig struct{
+	addr string
+	pw string
+	db int
+	enabled bool
+}
 type authConfig struct{
 	basic basicConfig
 	token tokenConfig
