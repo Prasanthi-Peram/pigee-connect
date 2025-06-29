@@ -13,7 +13,7 @@ import(
 	"github.com/Prasanthi-Peram/pigee-connect/internal/mailer"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/auth"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/store/cache"
-
+	"github.com/Prasanthi-Peram/pigee-connect/internal/ratelimiter"
 )
 
 const version="0.0.1"
@@ -76,10 +76,16 @@ func main(){
 				iss: "pigeeconnect",
 			},
 		},
+		rateLimiter: ratelimiter.Config{
+			RequestsPerTimeFrame: env.GetInt("RATELIMITER_REQUESTS_COUNT", 20),
+			TimeFrame:            time.Second * 5,
+			Enabled:              env.GetBool("RATE_LIMITER_ENABLED", true),
+		},
 	}
 	//fmt.Println("Loaded API Key from config:", cfg.mail.sendGrid.apiKey)
 	//fmt.Println("Loaded API Key from config:", cfg.mail.fromEmail)
-    //Logger
+    
+	//Logger
 	logger:=zap.Must(zap.NewProduction()).Sugar()
 	defer logger.Sync()
 
@@ -108,6 +114,12 @@ func main(){
 
 	}
 
+	// Rate limiter
+	rateLimiter := ratelimiter.NewFixedWindowLimiter(
+		cfg.rateLimiter.RequestsPerTimeFrame,
+		cfg.rateLimiter.TimeFrame,
+	)
+
 	store:= store.NewStorage(db)
 	cacheStorage := cache.NewRedisStorage(rdb)
 	mailer := mailer.NewSendgrid(cfg.mail.sendGrid.apiKey,cfg.mail.fromEmail)
@@ -120,6 +132,7 @@ func main(){
 		logger: logger,
 		mailer: mailer,
 		authenticator: jwtAuthenticator,
+		rateLimiter: rateLimiter,
 	}
 
 	mux:=app.mount()

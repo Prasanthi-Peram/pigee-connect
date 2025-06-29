@@ -7,6 +7,8 @@ import (
 	"github.com/Prasanthi-Peram/pigee-connect/internal/auth"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/store"
 	"github.com/Prasanthi-Peram/pigee-connect/internal/store/cache"
+	"github.com/Prasanthi-Peram/pigee-connect/internal/ratelimiter"
+
 	"go.uber.org/zap"
 )
 func newTestApplication(t *testing.T, cfg config) *application {
@@ -17,12 +19,19 @@ func newTestApplication(t *testing.T, cfg config) *application {
 	mockStore := store.NewMockStore()
 	mockCacheStore := cache.NewMockStore()
 	testAuth := &auth.TestAuthenticator{}
+
+	//Rate Limiter
+	rateLimiter := ratelimiter.NewFixedWindowLimiter(
+				cfg.rateLimiter.RequestsPerTimeFrame,
+				cfg.rateLimiter.TimeFrame,
+			)
 	return &application{
 		logger:  logger,
 		store:   mockStore,
 		cacheStorage:  mockCacheStore,
 		authenticator: testAuth,
 		config:  cfg,
+		rateLimiter:	rateLimiter,
 	}
 }
 func executeRequest(req *http.Request, mux http.Handler) *httptest.ResponseRecorder {
