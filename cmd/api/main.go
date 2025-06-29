@@ -2,6 +2,8 @@ package main
 import(
 	//"log"
 	//"fmt"
+	"expvar"
+	"runtime"
 	"time"
 	"os"
 	"github.com/joho/godotenv"
@@ -134,6 +136,15 @@ func main(){
 		authenticator: jwtAuthenticator,
 		rateLimiter: rateLimiter,
 	}
+
+	//Server Metrics
+	expvar.NewString("version").Set(version)
+	expvar.Publish("database", expvar.Func(func() any {
+		return db.Stats()
+	}))
+	expvar.Publish("goroutines", expvar.Func(func() any {
+		return runtime.NumGoroutine()
+	}))
 
 	mux:=app.mount()
 	logger.Fatal(app.run(mux))
