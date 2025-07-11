@@ -13,7 +13,13 @@ This project is in it's development phase
 - [X] Auto-generate docs for the API
 - [X] Implement Structured Logging
 - [X] Implement basic Authentication feature
-- [ ] Implement Redis Caching
-- [ ] Rate Limit the API
-- [ ] Automation: CI/CD
-- [ ] Production deployment to AWS/Google Cloud
+- [X] Implement Redis Caching
+- [X] Rate Limit the API
+- [X] Automation: CI/CD
+- [X] Production deployment to AWS/Google Cloud
+- [ ] Frontend/UI
+- [ ] Docs
+
+GCP Deployed link [API BACKEND](https://pigee-connect-194874488047.asia-south1.run.app/) 
+The deployement was tested in the production phase and redeployed in development phase to avoid sending unnecessary emails by using the link above.
+
