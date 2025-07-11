@@ -20,6 +20,6 @@ This project is in it's development phase
 - [ ] Frontend/UI
 - [ ] Docs
 
-GCP Deployed link [API BACKEND](https://pigee-connect-194874488047.asia-south1.run.app/) 
+GCP Deployed link [API BACKEND](https://pigee-connect-194874488047.asia-south1.run.app/v1/swagger/index.html) 
 The deployement was tested in the production phase and redeployed in development phase to avoid sending unnecessary emails by using the link above.
 
