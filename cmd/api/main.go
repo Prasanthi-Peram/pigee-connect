@@ -22,7 +22,7 @@ const version="0.0.1"
 
 //	@title			PigeeConnect API
 //	@version		1.0
-//	@description	This is a sample server Petstore server.
+//	@description	This is the documentation for a social media app backend
 //	@termsOfService	http://swagger.io/terms/
 
 //	@contact.name	API Support
